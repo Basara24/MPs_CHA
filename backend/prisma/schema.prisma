@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  CLIENTE
+  ADMIN
+  VENDEDOR
+}
+
+enum TerrenoStatus {
+  DISPONIVEL
+  RESERVADO
+  VENDIDO
+}
+
+enum ContratoStatus {
+  ATIVO
+  FINALIZADO
+  CANCELADO
+}
+
+enum PagamentoStatus {
+  PENDENTE
+  PAGO
+  ATRASADO
+}
+
+model User {
+  id                 Int          @id @default(autoincrement())
+  nome               String
+  email              String       @unique
+  senha              String
+  tipo               UserType     @default(CLIENTE)
+  createdAt          DateTime     @default(now())
+  terrenosCriados    Terreno[]    @relation("TerrenoCriador")
+  contratosCliente   Contrato[]   @relation("ContratoCliente")
+  contratosVendedor  Contrato[]   @relation("ContratoVendedor")
+  interesses         Interesse[]
+
+  @@map("users")
+}
+
+model Terreno {
+  id           Int            @id @default(autoincrement())
+  titulo       String
+  descricao    String         @db.Text
+  tamanho      Decimal        @db.Decimal(10, 2)
+  valor        Decimal        @db.Decimal(12, 2)
+  cidade       String
+  estado       String
+  status       TerrenoStatus  @default(DISPONIVEL)
+  createdBy    Int
+  createdAt    DateTime       @default(now())
+  criador      User           @relation("TerrenoCriador", fields: [createdBy], references: [id])
+  imagens      TerrenoImagem[]
+  contratos    Contrato[]
+  interesses   Interesse[]
+
+  @@index([cidade])
+  @@index([status])
+  @@map("terrenos")
+}
+
+model TerrenoImagem {
+  id        Int      @id @default(autoincrement())
+  terrenoId Int
+  url       String
+  terreno   Terreno  @relation(fields: [terrenoId], references: [id], onDelete: Cascade)
+
+  @@map("terreno_imagens")
+}
+
+model Interesse {
+  id         Int      @id @default(autoincrement())
+  terrenoId  Int
+  clienteId  Int
+  mensagem   String?
+  createdAt  DateTime @default(now())
+  terreno    Terreno  @relation(fields: [terrenoId], references: [id], onDelete: Cascade)
+  cliente    User     @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@index([terrenoId])
+  @@index([clienteId])
+  @@map("interesses")
+}
+
+model Contrato {
+  id           Int            @id @default(autoincrement())
+  clienteId    Int
+  terrenoId    Int
+  vendedorId   Int
+  valorTotal   Decimal        @db.Decimal(12, 2)
+  dataInicio   DateTime
+  status       ContratoStatus @default(ATIVO)
+  createdAt    DateTime       @default(now())
+  cliente      User           @relation("ContratoCliente", fields: [clienteId], references: [id])
+  terreno      Terreno        @relation(fields: [terrenoId], references: [id])
+  vendedor     User           @relation("ContratoVendedor", fields: [vendedorId], references: [id])
+  pagamentos   Pagamento[]
+
+  @@index([status])
+  @@map("contratos")
+}
+
+model Pagamento {
+  id             Int             @id @default(autoincrement())
+  contratoId     Int
+  valor          Decimal         @db.Decimal(12, 2)
+  dataVencimento DateTime
+  dataPagamento  DateTime?
+  status         PagamentoStatus @default(PENDENTE)
+  contrato       Contrato        @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([dataVencimento])
+  @@map("pagamentos")
+}
