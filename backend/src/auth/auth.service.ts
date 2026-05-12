@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserType } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -14,9 +14,15 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    if (dto.tipo && dto.tipo !== UserType.CLIENTE) {
+      throw new ForbiddenException(
+        'Somente administradores podem cadastrar administradores e corretores',
+      );
+    }
+
     const createdUser = await this.usersService.create({
       ...dto,
-      tipo: dto.tipo ?? UserType.CLIENTE,
+      tipo: UserType.CLIENTE,
     });
 
     return this.signToken({

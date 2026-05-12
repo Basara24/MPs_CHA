@@ -30,6 +30,7 @@ export function ShellLayout() {
             <NavLink to="/relatorios">Relatórios</NavLink>
           </>
         )}
+        {user?.tipo === 'ADMIN' && <NavLink to="/register">Cadastrar equipe</NavLink>}
       </nav>
 
       <main>

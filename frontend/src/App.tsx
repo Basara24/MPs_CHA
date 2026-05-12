@@ -8,6 +8,7 @@ import { ContratosPage } from './pages/ContratosPage';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { PerfilPage } from './pages/PerfilPage';
+import { RegisterPage } from './pages/RegisterPage';
 import { RelatoriosPage } from './pages/RelatoriosPage';
 import { TerrenoDetalhePage } from './pages/TerrenoDetalhePage';
 import { TerrenosPage } from './pages/TerrenosPage';
@@ -17,6 +18,7 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route
           path="/"
           element={

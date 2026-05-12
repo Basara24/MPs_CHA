@@ -56,9 +56,12 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async register(dto) {
+        if (dto.tipo && dto.tipo !== client_1.UserType.CLIENTE) {
+            throw new common_1.ForbiddenException('Somente administradores podem cadastrar administradores e corretores');
+        }
         const createdUser = await this.usersService.create({
             ...dto,
-            tipo: dto.tipo ?? client_1.UserType.CLIENTE,
+            tipo: client_1.UserType.CLIENTE,
         });
         return this.signToken({
             sub: createdUser.id,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
 export function LoginPage() {
@@ -41,6 +41,9 @@ export function LoginPage() {
         />
         {error && <p className="error">{error}</p>}
         <button type="submit">Entrar</button>
+        <p>
+          Ainda não tem conta? <Link to="/register">Criar conta</Link>
+        </p>
       </form>
     </div>
   );
