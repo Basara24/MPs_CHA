@@ -10,6 +10,7 @@ interface Cliente {
 
 export function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [busca, setBusca] = useState('');
 
   useEffect(() => {
     api.get<Cliente[]>('/users').then((res) => {
@@ -17,15 +18,33 @@ export function ClientesPage() {
     });
   }, []);
 
+  const clientesFiltrados = clientes.filter(
+    (cliente) =>
+      cliente.nome.toLowerCase().includes(busca.toLowerCase()) ||
+      cliente.email.toLowerCase().includes(busca.toLowerCase()),
+  );
+
   return (
-    <section>
-      <h2>Gestão de clientes</h2>
+    <section className="page-section">
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Gestao de clientes</h2>
+          <p className="page-subtitle">Visualize perfis, contatos e carteira de compradores.</p>
+        </div>
+      </div>
+      <div className="card">
+        <input
+          placeholder="Buscar por nome ou e-mail"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+      </div>
       <div className="grid">
-        {clientes.map((cliente) => (
-          <article key={cliente.id} className="card">
+        {clientesFiltrados.map((cliente) => (
+          <article key={cliente.id} className="card card-hover">
             <h3>{cliente.nome}</h3>
             <p>{cliente.email}</p>
-            <p>{cliente.tipo}</p>
+            <span className="chip status-chip">{cliente.tipo}</span>
           </article>
         ))}
       </div>

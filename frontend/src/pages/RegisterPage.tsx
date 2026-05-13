@@ -60,9 +60,17 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="center-screen">
-      <form onSubmit={onSubmit} className="card narrow">
-        <h1>{isAdmin ? 'Cadastro de administradores e corretores' : 'Criar conta'}</h1>
+    <div className="center-screen auth-screen">
+      <form onSubmit={onSubmit} className="card auth-card narrow form-grid">
+        <span className="auth-logo">TerraGest Prime</span>
+        <h1 className="page-title">
+          {isAdmin ? 'Cadastro de administradores e corretores' : 'Criar sua conta'}
+        </h1>
+        <p className="auth-note">
+          {isAdmin
+            ? 'Adicione membros da equipe para ampliar a operacao comercial.'
+            : 'Comece a acompanhar oportunidades de investimento em terrenos com total transparencia.'}
+        </p>
         <input
           type="text"
           placeholder="Nome completo"
@@ -98,15 +106,15 @@ export function RegisterPage() {
         )}
 
         {error && <p className="error">{error}</p>}
-        {success && <p>{success}</p>}
+        {success && <p className="status-chip">{success}</p>}
 
         <button type="submit" disabled={loading}>
           {loading ? 'Salvando...' : submitLabel}
         </button>
 
         {!isAdmin && (
-          <p>
-            Já tem conta? <Link to="/login">Entrar</Link>
+          <p className="auth-note">
+            Ja tem conta? <Link to="/login">Entrar</Link>
           </p>
         )}
       </form>

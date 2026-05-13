@@ -36,10 +36,21 @@ export function ContratosPage() {
     await load();
   }
 
+  function getStatusClass(status: string) {
+    if (status === 'CANCELADO') return 'status-chip danger';
+    if (status === 'FINALIZADO') return 'status-chip';
+    return 'status-chip warning';
+  }
+
   return (
-    <section>
-      <h2>Gestão de contratos</h2>
-      <form className="card" onSubmit={onSubmit}>
+    <section className="page-section">
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Gestao de contratos</h2>
+          <p className="page-subtitle">Formalize vendas e acompanhe situacao financeira dos acordos.</p>
+        </div>
+      </div>
+      <form className="card form-grid" onSubmit={onSubmit}>
         <h3>Novo contrato</h3>
         <div className="toolbar">
           <input
@@ -92,12 +103,12 @@ export function ContratosPage() {
 
       <div className="grid">
         {contratos.map((contrato) => (
-          <article className="card" key={contrato.id}>
+          <article className="card card-hover" key={contrato.id}>
             <h3>Contrato #{contrato.id}</h3>
             <p>Cliente: {contrato.cliente.nome}</p>
             <p>Terreno: {contrato.terreno.titulo}</p>
-            <p>Status: {contrato.status}</p>
-            <p>Valor total: R$ {Number(contrato.valorTotal).toLocaleString('pt-BR')}</p>
+            <span className={getStatusClass(contrato.status)}>{contrato.status}</span>
+            <p className="metric-value">R$ {Number(contrato.valorTotal).toLocaleString('pt-BR')}</p>
           </article>
         ))}
       </div>

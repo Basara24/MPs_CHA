@@ -40,10 +40,18 @@ export function TerrenosPage() {
   }
 
   return (
-    <section>
-      <h2>Gestão de terrenos</h2>
+    <section className="page-section">
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">{canManage ? 'Gestao de terrenos' : 'Catalogo de terrenos'}</h2>
+          <p className="page-subtitle">
+            Explore propriedades selecionadas com visualizacao completa de valor e localizacao.
+          </p>
+        </div>
+      </div>
+
       {canManage && (
-        <form className="card" onSubmit={onSubmit}>
+        <form className="card form-grid" onSubmit={onSubmit}>
           <h3>Novo terreno</h3>
           <input
             placeholder="Título"
@@ -93,14 +101,25 @@ export function TerrenosPage() {
 
       <div className="grid">
         {terrenos.map((terreno) => (
-          <article key={terreno.id} className="card">
+          <article key={terreno.id} className="card card-hover">
+            {terreno.imagens[0]?.url ? (
+              <img className="card-image" src={terreno.imagens[0].url} alt={terreno.titulo} />
+            ) : (
+              <div className="card-image" />
+            )}
             <h3>{terreno.titulo}</h3>
             <p>{terreno.descricao}</p>
-            <p>
-              {terreno.cidade}/{terreno.estado}
-            </p>
-            <p>Status: {terreno.status}</p>
-            <Link to={`/terrenos/${terreno.id}`}>Detalhes</Link>
+            <div className="card-meta">
+              <span className="chip">
+                {terreno.cidade}/{terreno.estado}
+              </span>
+              <span className="chip">{Number(terreno.tamanho)} m²</span>
+              <span className="chip status-chip">{terreno.status}</span>
+            </div>
+            <p className="metric-value">R$ {Number(terreno.valor).toLocaleString('pt-BR')}</p>
+            <Link to={`/terrenos/${terreno.id}`} className="button-secondary">
+              Detalhes
+            </Link>
             {canManage && (
               <button type="button" onClick={() => void remove(terreno.id)}>
                 Excluir

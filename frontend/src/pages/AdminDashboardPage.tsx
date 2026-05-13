@@ -17,7 +17,13 @@ export function AdminDashboardPage() {
     api.get<Kpis>('/dashboard/kpis').then((res) => setKpis(res.data));
   }, []);
 
-  if (!kpis) return <p>Carregando dashboard...</p>;
+  if (!kpis) {
+    return (
+      <section className="page-section">
+        <div className="card loading-state">Carregando dashboard...</div>
+      </section>
+    );
+  }
 
   const chartData = [
     { name: 'Vendas', valor: kpis.totalVendas },
@@ -27,20 +33,32 @@ export function AdminDashboardPage() {
   ];
 
   return (
-    <section>
-      <h2>Dashboard comercial</h2>
+    <section className="page-section">
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Dashboard comercial</h2>
+          <p className="page-subtitle">
+            Acompanhe receita, performance de vendas e saude da carteira em tempo real.
+          </p>
+        </div>
+      </div>
+
       <div className="grid">
-        <article className="card">
+        <article className="card card-hover">
           <h3>Total de vendas</h3>
-          <p>{kpis.totalVendas}</p>
+          <p className="metric-value">{kpis.totalVendas}</p>
         </article>
-        <article className="card">
+        <article className="card card-hover">
           <h3>Receita</h3>
-          <p>R$ {kpis.receita.toLocaleString('pt-BR')}</p>
+          <p className="metric-value">R$ {kpis.receita.toLocaleString('pt-BR')}</p>
         </article>
-        <article className="card">
+        <article className="card card-hover">
           <h3>Parcelas atrasadas</h3>
-          <p>{kpis.parcelasAtrasadas}</p>
+          <p className="metric-value">{kpis.parcelasAtrasadas}</p>
+        </article>
+        <article className="card card-hover">
+          <h3>Terrenos vendidos</h3>
+          <p className="metric-value">{kpis.terrenosVendidos}</p>
         </article>
       </div>
 
@@ -52,9 +70,29 @@ export function AdminDashboardPage() {
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="valor" fill="#2f6fed" />
+            <Bar dataKey="valor" fill="#2E7D32" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      <div className="card">
+        <h3>Resumo recente</h3>
+        <table className="simple-table">
+          <thead>
+            <tr>
+              <th>Indicador</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {chartData.map((item) => (
+              <tr key={item.name}>
+                <td>{item.name}</td>
+                <td>{item.valor}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </section>
   );

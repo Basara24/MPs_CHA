@@ -22,27 +22,31 @@ export function LoginPage() {
   }
 
   return (
-    <div className="center-screen">
-      <form onSubmit={onSubmit} className="card narrow">
-        <h1>Entrar no TerraGest</h1>
+    <div className="center-screen auth-screen">
+      <form onSubmit={onSubmit} className="card auth-card narrow form-grid">
+        <span className="auth-logo">TerraGest Prime</span>
+        <h1 className="page-title">Acesse sua area de investimentos</h1>
+        <p className="auth-note">
+          Controle de terrenos e chacaras com seguranca, visao de mercado e operacao premium.
+        </p>
         <input
           type="email"
-          placeholder="E-mail"
+          placeholder="Seu e-mail"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Senha"
+          placeholder="Sua senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           required
         />
         {error && <p className="error">{error}</p>}
-        <button type="submit">Entrar</button>
-        <p>
-          Ainda não tem conta? <Link to="/register">Criar conta</Link>
+        <button type="submit">Entrar na plataforma</button>
+        <p className="auth-note">
+          Ainda nao tem conta? <Link to="/register">Criar conta</Link>
         </p>
       </form>
     </div>

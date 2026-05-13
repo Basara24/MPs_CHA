@@ -24,27 +24,58 @@ export function RelatoriosPage() {
   }, []);
 
   return (
-    <section>
-      <h2>Relatórios e financeiro</h2>
-      <div className="card">
-        <a href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/reports/vendas.csv`}>
-          Baixar relatório de vendas (CSV)
+    <section className="page-section">
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Relatorios e financeiro</h2>
+          <p className="page-subtitle">
+            Exporte dados da operacao e acompanhe o fluxo de pagamentos pendentes.
+          </p>
+        </div>
+      </div>
+
+      <div className="card section-stack">
+        <h3>Exportacoes</h3>
+        <a
+          className="button-secondary"
+          href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/reports/vendas.csv`}
+        >
+          Baixar relatorio de vendas (CSV)
         </a>
         <a
+          className="button-secondary"
           href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/reports/inadimplencia.csv`}
         >
-          Baixar relatório de inadimplência (CSV)
+          Baixar relatorio de inadimplencia (CSV)
         </a>
       </div>
 
       <div className="card">
         <h3>Parcelas em atraso: {resumo?.total ?? 0}</h3>
-        {resumo?.itens.map((item) => (
-          <p key={item.id}>
-            {item.contrato.cliente.nome} - {item.contrato.terreno.titulo} - R$ {Number(item.valor)} -
-            vencimento {new Date(item.dataVencimento).toLocaleDateString('pt-BR')}
-          </p>
-        ))}
+        {!resumo?.itens.length ? (
+          <div className="empty-state">Nenhuma parcela em atraso no momento.</div>
+        ) : (
+          <table className="simple-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Terreno</th>
+                <th>Valor</th>
+                <th>Vencimento</th>
+              </tr>
+            </thead>
+            <tbody>
+              {resumo.itens.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.contrato.cliente.nome}</td>
+                  <td>{item.contrato.terreno.titulo}</td>
+                  <td>R$ {Number(item.valor).toLocaleString('pt-BR')}</td>
+                  <td>{new Date(item.dataVencimento).toLocaleDateString('pt-BR')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </section>
   );
