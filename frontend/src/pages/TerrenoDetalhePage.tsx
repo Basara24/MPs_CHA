@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { api } from '../api/client';
+import { api, resolveAssetUrl } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import type { Terreno } from '../types';
 
@@ -68,7 +68,7 @@ export function TerrenoDetalhePage() {
               <img
                 key={imagem.id}
                 className="card-image"
-                src={imagem.url}
+                src={resolveAssetUrl(imagem.url)}
                 alt={`${terreno.titulo} - imagem ${imagem.id}`}
               />
             ))

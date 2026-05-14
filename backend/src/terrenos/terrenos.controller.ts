@@ -36,11 +36,18 @@ export class TerrenosController {
 
   @Post()
   @Roles(UserType.ADMIN, UserType.VENDEDOR)
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+      storage,
+    }),
+  )
   create(
     @Body() dto: CreateTerrenoDto,
     @CurrentUser() user: { sub: number },
+    @UploadedFiles()
+    files: { images?: Express.Multer.File[] },
   ) {
-    return this.terrenosService.create(dto, user.sub);
+    return this.terrenosService.create(dto, user.sub, files.images ?? []);
   }
 
   @Get()

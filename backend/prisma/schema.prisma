@@ -35,6 +35,10 @@ model User {
   id                 Int          @id @default(autoincrement())
   nome               String
   email              String       @unique
+  cpf                String?      @unique
+  telefone           String?
+  cidade             String?
+  estado             String?
   senha              String
   tipo               UserType     @default(CLIENTE)
   createdAt          DateTime     @default(now())

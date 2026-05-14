@@ -1,22 +1,43 @@
 import { useEffect, useState } from 'react';
-import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../api/client';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { api, resolveAssetUrl } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
+import { ImageUploadField } from '../components/ImageUploadField';
+import { LocationSelectFields } from '../components/LocationSelectFields';
 import type { Terreno } from '../types';
+import { terrenoFormSchema } from '../validation/schemas';
+import type { TerrenoFormInput } from '../validation/schemas';
 
 export function TerrenosPage() {
   const { user } = useAuth();
   const canManage = user?.tipo === 'ADMIN' || user?.tipo === 'VENDEDOR';
   const [terrenos, setTerrenos] = useState<Terreno[]>([]);
-  const [form, setForm] = useState({
-    titulo: '',
-    descricao: '',
-    tamanho: 0,
-    valor: 0,
-    cidade: '',
-    estado: '',
+  const [images, setImages] = useState<File[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<TerrenoFormInput>({
+    resolver: zodResolver(terrenoFormSchema),
+    mode: 'onChange',
+    defaultValues: {
+      titulo: '',
+      descricao: '',
+      tamanho: 0,
+      valor: 0,
+      cidade: '',
+      estado: '',
+    },
   });
+  const selectedEstado = watch('estado');
+  const selectedCidade = watch('cidade');
 
   async function load() {
     const res = await api.get<Terreno[]>('/terrenos');
@@ -27,11 +48,29 @@ export function TerrenosPage() {
     void load();
   }, []);
 
-  async function onSubmit(event: FormEvent) {
-    event.preventDefault();
-    await api.post('/terrenos', form);
-    setForm({ titulo: '', descricao: '', tamanho: 0, valor: 0, cidade: '', estado: '' });
-    await load();
+  async function onSubmit(values: TerrenoFormInput) {
+    setSubmitting(true);
+    setFormError('');
+
+    try {
+      const payload = new FormData();
+      payload.append('titulo', values.titulo);
+      payload.append('descricao', values.descricao);
+      payload.append('tamanho', String(values.tamanho));
+      payload.append('valor', String(values.valor));
+      payload.append('estado', values.estado);
+      payload.append('cidade', values.cidade);
+      images.forEach((file) => payload.append('images', file));
+
+      await api.post('/terrenos', payload);
+      reset();
+      setImages([]);
+      await load();
+    } catch {
+      setFormError('Nao foi possivel cadastrar o terreno no momento.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function remove(id: number) {
@@ -51,51 +90,49 @@ export function TerrenosPage() {
       </div>
 
       {canManage && (
-        <form className="card form-grid" onSubmit={onSubmit}>
+        <form className="card form-grid" onSubmit={handleSubmit(onSubmit)}>
           <h3>Novo terreno</h3>
-          <input
-            placeholder="Título"
-            value={form.titulo}
-            onChange={(e) => setForm((old) => ({ ...old, titulo: e.target.value }))}
-            required
-          />
-          <textarea
-            placeholder="Descrição"
-            value={form.descricao}
-            onChange={(e) => setForm((old) => ({ ...old, descricao: e.target.value }))}
-            required
-          />
+          <input placeholder="Titulo" {...register('titulo')} />
+          {errors.titulo && <p className="error">{errors.titulo.message}</p>}
+          <textarea placeholder="Descricao" {...register('descricao')} />
+          {errors.descricao && <p className="error">{errors.descricao.message}</p>}
           <div className="toolbar">
-            <input
-              type="number"
-              placeholder="Tamanho m²"
-              value={form.tamanho || ''}
-              onChange={(e) => setForm((old) => ({ ...old, tamanho: Number(e.target.value) }))}
-              required
-            />
-            <input
-              type="number"
-              placeholder="Valor"
-              value={form.valor || ''}
-              onChange={(e) => setForm((old) => ({ ...old, valor: Number(e.target.value) }))}
-              required
-            />
+            <div className="form-grid">
+              <input
+                type="number"
+                placeholder="Tamanho m²"
+                min={1}
+                step="0.01"
+                {...register('tamanho', { valueAsNumber: true })}
+              />
+              {errors.tamanho && <p className="error">{errors.tamanho.message}</p>}
+            </div>
+            <div className="form-grid">
+              <input
+                type="number"
+                placeholder="Valor"
+                min={1}
+                step="0.01"
+                {...register('valor', { valueAsNumber: true })}
+              />
+              {errors.valor && <p className="error">{errors.valor.message}</p>}
+            </div>
           </div>
-          <div className="toolbar">
-            <input
-              placeholder="Cidade"
-              value={form.cidade}
-              onChange={(e) => setForm((old) => ({ ...old, cidade: e.target.value }))}
-              required
-            />
-            <input
-              placeholder="Estado"
-              value={form.estado}
-              onChange={(e) => setForm((old) => ({ ...old, estado: e.target.value }))}
-              required
-            />
-          </div>
-          <button type="submit">Cadastrar terreno</button>
+          <LocationSelectFields
+            estado={selectedEstado}
+            cidade={selectedCidade}
+            onEstadoChange={(value) => setValue('estado', value, { shouldValidate: true })}
+            onCidadeChange={(value) => setValue('cidade', value, { shouldValidate: true })}
+            estadoError={errors.estado?.message}
+            cidadeError={errors.cidade?.message}
+          />
+          <input type="hidden" {...register('estado')} />
+          <input type="hidden" {...register('cidade')} />
+          <ImageUploadField files={images} onChange={setImages} loading={submitting} />
+          {formError && <p className="error">{formError}</p>}
+          <button type="submit" disabled={submitting}>
+            {submitting ? 'Salvando terreno...' : 'Cadastrar terreno'}
+          </button>
         </form>
       )}
 
@@ -103,7 +140,11 @@ export function TerrenosPage() {
         {terrenos.map((terreno) => (
           <article key={terreno.id} className="card card-hover">
             {terreno.imagens[0]?.url ? (
-              <img className="card-image" src={terreno.imagens[0].url} alt={terreno.titulo} />
+              <img
+                className="card-image"
+                src={resolveAssetUrl(terreno.imagens[0].url)}
+                alt={terreno.titulo}
+              />
             ) : (
               <div className="card-image" />
             )}

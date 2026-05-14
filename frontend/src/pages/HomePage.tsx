@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../api/client';
+import { api, resolveAssetUrl } from '../api/client';
 import type { Terreno } from '../types';
 
 export function HomePage() {
@@ -86,7 +86,11 @@ export function HomePage() {
         {terrenosFiltrados.map((terreno) => (
           <article key={terreno.id} className="card card-hover">
             {terreno.imagens[0]?.url ? (
-              <img className="card-image" src={terreno.imagens[0].url} alt={terreno.titulo} />
+              <img
+                className="card-image"
+                src={resolveAssetUrl(terreno.imagens[0].url)}
+                alt={terreno.titulo}
+              />
             ) : (
               <div className="card-image" />
             )}

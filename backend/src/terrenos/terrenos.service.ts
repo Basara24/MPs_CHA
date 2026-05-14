@@ -8,11 +8,18 @@ import { UpdateTerrenoDto } from './dto/update-terreno.dto';
 export class TerrenosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(dto: CreateTerrenoDto, createdBy: number) {
+  create(dto: CreateTerrenoDto, createdBy: number, files: Express.Multer.File[] = []) {
     return this.prisma.terreno.create({
       data: {
         ...dto,
         createdBy,
+        imagens: files.length
+          ? {
+              create: files.map((file) => ({
+                url: `/uploads/${file.filename}`,
+              })),
+            }
+          : undefined,
       },
       include: { imagens: true },
     });

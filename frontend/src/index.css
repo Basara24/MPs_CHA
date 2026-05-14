@@ -275,6 +275,75 @@ textarea {
   gap: var(--space-2);
 }
 
+.location-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-2);
+}
+
+.upload-dropzone {
+  position: relative;
+  border: 1px dashed var(--info-200);
+  background: linear-gradient(145deg, #f6fff9 0%, #f1fbff 100%);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  transition: all 0.2s ease;
+}
+
+.upload-dropzone:hover {
+  border-color: var(--brand-500);
+  box-shadow: var(--shadow-sm);
+}
+
+.upload-dropzone.is-dragging {
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.18);
+}
+
+.upload-dropzone input[type='file'] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-dropzone-title {
+  font-weight: 600;
+  color: var(--neutral-700);
+}
+
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-2);
+}
+
+.upload-card {
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.upload-preview {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.upload-meta {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+}
+
+.upload-meta p {
+  font-size: 0.82rem;
+  color: var(--neutral-700);
+  word-break: break-word;
+}
+
 .button-primary,
 .button-secondary,
 button {

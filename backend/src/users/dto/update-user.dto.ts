@@ -1,5 +1,6 @@
 import { UserType } from '@prisma/client';
-import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, Length, Matches, MinLength } from 'class-validator';
+import { IsCpf } from '../../common/validators/is-cpf.validator';
 
 export class UpdateUserDto {
   @IsString()
@@ -11,7 +12,28 @@ export class UpdateUserDto {
   email?: string;
 
   @IsString()
-  @MinLength(6)
+  @Length(11, 14)
+  @IsCpf({ message: 'CPF invalido' })
+  @IsOptional()
+  cpf?: string;
+
+  @IsString()
+  @IsOptional()
+  telefone?: string;
+
+  @IsString()
+  @IsOptional()
+  cidade?: string;
+
+  @IsString()
+  @Length(2, 2)
+  @IsOptional()
+  estado?: string;
+
+  @IsString()
+  @MinLength(8)
+  @Matches(/[A-Z]/, { message: 'A senha precisa conter uma letra maiuscula' })
+  @Matches(/\d/, { message: 'A senha precisa conter um numero' })
   @IsOptional()
   senha?: string;
 
